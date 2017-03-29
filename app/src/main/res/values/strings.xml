@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SavingsManager</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="screen_title_add_savings_item">Add a savings item</string>
+</resources>
