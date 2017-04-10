@@ -5,4 +5,15 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="screen_title_add_savings_item">Add a savings item</string>
+    <string name="txt_bank_name">Bank:</string>
+    <string name="txt_start_date">Start Date:</string>
+    <string name="txt_end_date">End Date:</string>
+    <string name="txt_amount">Amount:</string>
+    <string name="txt_annualized_yield">Annualized Yield(%):</string>
+    <string name="txt_expected_interest">Expected Interest:</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+
+    <!-- Add Savings Item screen -->
+
 </resources>

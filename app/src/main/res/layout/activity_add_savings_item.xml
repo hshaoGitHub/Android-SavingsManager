@@ -30,8 +30,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Bank:"
-
+                    android:text="@string/txt_bank_name"
                     android:textSize="@dimen/text_size_medium" />
 
                 <EditText
@@ -55,7 +54,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Start Date:"
+                    android:text="@string/txt_start_date"
                     android:textSize="@dimen/text_size_medium" />
 
                 <EditText
@@ -64,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/activity_horizontal_margin"
                     android:layout_weight="3"
-                    android:inputType="date" />
+                    android:inputType="none"/>
             </LinearLayout>
 
             <LinearLayout
@@ -79,7 +78,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="End Date:"
+                    android:text="@string/txt_end_date"
                     android:textSize="@dimen/text_size_medium" />
 
                 <EditText
@@ -88,7 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/activity_horizontal_margin"
                     android:layout_weight="3"
-                    android:inputType="date" />
+                    android:inputType="none" />
             </LinearLayout>
 
             <LinearLayout
@@ -103,7 +102,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Amount:"
+                    android:text="@string/txt_amount"
                     android:textSize="@dimen/text_size_medium" />
 
                 <EditText
@@ -127,7 +126,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Annualized Yield:"
+                    android:text="@string/txt_annualized_yield"
                     android:textSize="@dimen/text_size_medium" />
 
                 <EditText
@@ -152,12 +151,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Expected Interest:"
+                    android:text="@string/txt_expected_interest"
                     android:textColor="@color/colorPrimary"
                     android:textSize="@dimen/text_size_medium" />
 
                 <EditText
-                    android:id="@+id/edit_rate"
+                    android:id="@+id/edit_interest"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -166,6 +165,7 @@
                     android:cursorVisible="false"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
+                    android:inputType="none"
                     android:textColor="@color/colorPrimary" />
             </LinearLayout>
         </LinearLayout>
@@ -181,10 +181,11 @@
 
         <Button
             android:id="@+id/btn_cancel"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
 
         <Button
             android:id="@+id/btn_save"
@@ -193,6 +194,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_weight="2"
-            android:text="Save" />
+            android:text="@string/save" />
     </LinearLayout>
 </LinearLayout>
