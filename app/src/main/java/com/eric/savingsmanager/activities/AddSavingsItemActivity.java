@@ -1,6 +1,9 @@
 package com.eric.savingsmanager.activities;
 
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -8,10 +11,14 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.eric.savingsmanager.R;
+import com.eric.savingsmanager.data.SavingsContentProvider;
+import com.eric.savingsmanager.data.SavingsItemEntry;
 import com.eric.savingsmanager.utils.Constants;
 import com.eric.savingsmanager.utils.Utils;
 
@@ -32,6 +39,9 @@ public class AddSavingsItemActivity extends AppCompatActivity {
     private Calendar mCalendar = Calendar.getInstance();
     private Date mStartDate;
     private Date mEndDate;
+    private float mAmount;
+    private float mYield;
+    private float mInterest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +64,7 @@ public class AddSavingsItemActivity extends AppCompatActivity {
         mEditInterest = (EditText) findViewById(R.id.edit_interest);
 
         // set text watcher to update interest
+        mEditBankName.addTextChangedListener(mInterestTextWatcher);
         mEditAmount.addTextChangedListener(mInterestTextWatcher);
         mEditYield.addTextChangedListener(mInterestTextWatcher);
         mEditAmount.setOnFocusChangeListener(mOnFocusChangeListener);
@@ -125,7 +136,7 @@ public class AddSavingsItemActivity extends AppCompatActivity {
                 EditText edit = (EditText) v;
                 String amountStr = edit.getText().toString();
                 if (!Utils.isNullOrEmpty(amountStr)) {
-                    edit.setText(Utils.formatDouble(Double.valueOf(amountStr)));
+                    edit.setText(Utils.getFloat(amountStr));
                 }
             }
         }
@@ -138,6 +149,9 @@ public class AddSavingsItemActivity extends AppCompatActivity {
      * @param startDate whether it's start date
      */
     private void showDatePicker(final EditText edit, final boolean startDate) {
+        // hide keyboard
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(edit.getWindowToken(), 0);
 
         // show date picker
         DatePickerDialog picker = new DatePickerDialog(AddSavingsItemActivity.this,
@@ -169,18 +183,25 @@ public class AddSavingsItemActivity extends AppCompatActivity {
 
         String amountStr = mEditAmount.getText().toString();
         String yieldStr = mEditYield.getText().toString();
+        String bankStr = mEditBankName.getText().toString();
 
+        // calculate interest when all fields are available
         if (mStartDate != null && mEndDate != null
                 && !Utils.isNullOrEmpty(amountStr)
-                && !Utils.isNullOrEmpty(yieldStr)) {
+                && !Utils.isNullOrEmpty(yieldStr)
+                && !Utils.isNullOrEmpty(bankStr)) {
+
+            float days = Utils.getDiffDays(mStartDate, mEndDate);
+            mAmount = Float.valueOf(amountStr);
+            mYield = Float.valueOf(yieldStr);
+
+            // calculate the value
+            mInterest = mAmount * (mYield / 100) * (days / Constants.DAYS_OF_ONE_YEAR);
+            mInterest = Utils.roundFloat(mInterest);
             // update the interest value in UI
-            double days = Utils.getDiffDays(mStartDate, mEndDate);
-            double amount = Double.valueOf(amountStr);
-            double yield = Double.valueOf(yieldStr);
-            double interest = amount * (yield / 100) * (days / Constants.DAYS_OF_ONE_YEAR);
-            mEditInterest.setText(Utils.formatDouble(interest));
+            mEditInterest.setText(Utils.formatFloat(mInterest));
             Log.d(Constants.LOG_TAG, "start = " + mStartDate.toString() + "\nend = " + mEndDate.toString()
-                    + "\ndays = " + days + "\namount = " + amount + "\nyield = " + yield + "\ninterest = " + interest);
+                    + "\ndays = " + days + "\namount = " + mAmount + "\nyield = " + mYield + "\ninterest = " + mInterest);
         }
 
     }
@@ -200,6 +221,30 @@ public class AddSavingsItemActivity extends AppCompatActivity {
      * @param view the save button
      */
     public void onSaveClicked(View view) {
-        //TODO save the item
+
+        if (mInterest != 0.0f) {
+
+            ContentValues values = new ContentValues();
+            values.put(SavingsItemEntry.COLUMN_NAME_BANK_NAME, mEditBankName.getText().toString());
+            values.put(SavingsItemEntry.COLUMN_NAME_AMOUNT, mAmount);
+            values.put(SavingsItemEntry.COLUMN_NAME_YIELD, mYield);
+            values.put(SavingsItemEntry.COLUMN_NAME_START_DATE, mStartDate.getTime());
+            values.put(SavingsItemEntry.COLUMN_NAME_END_DATE, mEndDate.getTime());
+            values.put(SavingsItemEntry.COLUMN_NAME_INTEREST, mInterest);
+
+            // Save the data into database by ContentProvider
+            getContentResolver().insert(
+                    SavingsContentProvider.CONTENT_URI,
+                    values
+            );
+
+            // Go back to dashboard
+            Intent intent = new Intent(this, DashBoardActivity.class);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, R.string.missing_savings_information, Toast.LENGTH_LONG).show();
+        }
+
+
     }
 }

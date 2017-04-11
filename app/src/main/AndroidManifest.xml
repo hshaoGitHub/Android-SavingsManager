@@ -12,6 +12,7 @@
         <activity
             android:name=".activities.DashBoardActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +24,13 @@
             android:name=".activities.AddSavingsItemActivity"
             android:label="@string/screen_title_add_savings_item"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
+
+        <provider
+            android:name=".data.SavingsContentProvider"
+            android:authorities="com.eric.savingsmanager.provider"
+            android:enabled="true"
+            android:exported="false"></provider>
     </application>
 
 </manifest>

@@ -1,5 +1,7 @@
 package com.eric.savingsmanager.utils;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,8 +27,9 @@ public class Utils {
 
     /**
      * Get the diff days between two dates
+     *
      * @param start start date
-     * @param end end date
+     * @param end   end date
      * @return days
      */
     public static int getDiffDays(Date start, Date end) {
@@ -49,6 +52,7 @@ public class Utils {
 
     /**
      * Whether string is empty or null
+     *
      * @param str value
      * @return emptyOrNull or not
      */
@@ -57,11 +61,41 @@ public class Utils {
     }
 
     /**
-     * Format a double to xxx.xx
-     * @param value a double to format
+     * Format a float to xxx.xx
+     *
+     * @param value a float to format
      * @return a formatted string
      */
-    public static String formatDouble(double value) {
-        return String.format(Locale.US, "%.2f", value);
+    public static String formatFloat(float value) {
+        DecimalFormat df = new DecimalFormat("#.00");
+        return df.format(value);
+    }
+
+    /**
+     * Format a float to xxx.xx
+     *
+     * @param str a string of float
+     * @return a formatted string
+     */
+    public static String getFloat(String str) {
+        float value;
+        try {
+            value = Float.valueOf(str);
+        } catch (NumberFormatException ex) {
+            value = 0.0f;
+        }
+
+        return formatFloat(value);
+    }
+
+    /**
+     * round float to .00
+     *
+     * @param f float
+     * @return the .00 float
+     */
+    public static float roundFloat(float f) {
+        BigDecimal b = new BigDecimal(f);
+        return b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
     }
 }
