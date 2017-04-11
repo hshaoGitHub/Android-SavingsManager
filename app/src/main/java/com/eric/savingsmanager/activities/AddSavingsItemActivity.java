@@ -1,7 +1,6 @@
 package com.eric.savingsmanager.activities;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -9,7 +8,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
@@ -19,7 +17,6 @@ import com.eric.savingsmanager.utils.Utils;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 public class AddSavingsItemActivity extends AppCompatActivity {
 
@@ -59,6 +56,8 @@ public class AddSavingsItemActivity extends AppCompatActivity {
         // set text watcher to update interest
         mEditAmount.addTextChangedListener(mInterestTextWatcher);
         mEditYield.addTextChangedListener(mInterestTextWatcher);
+        mEditAmount.setOnFocusChangeListener(mOnFocusChangeListener);
+        mEditYield.setOnFocusChangeListener(mOnFocusChangeListener);
 
         // set date field listener
         mEditStartDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -95,8 +94,8 @@ public class AddSavingsItemActivity extends AppCompatActivity {
                 }
             }
         });
-    }
 
+    }
 
     /**
      * A text watcher for fields which impacts interest
@@ -117,14 +116,28 @@ public class AddSavingsItemActivity extends AppCompatActivity {
     };
 
     /**
+     * A OnFocusChangeListener for Amount and Yield field
+     */
+    private View.OnFocusChangeListener mOnFocusChangeListener = new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if (!hasFocus) {
+                EditText edit = (EditText) v;
+                String amountStr = edit.getText().toString();
+                if (!Utils.isNullOrEmpty(amountStr)) {
+                    edit.setText(Utils.formatDouble(Double.valueOf(amountStr)));
+                }
+            }
+        }
+    };
+
+    /**
      * Show date picker for edit field of date
      *
-     * @param edit date field
+     * @param edit      date field
+     * @param startDate whether it's start date
      */
     private void showDatePicker(final EditText edit, final boolean startDate) {
-        // hide keyboard
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(edit.getWindowToken(), 0);
 
         // show date picker
         DatePickerDialog picker = new DatePickerDialog(AddSavingsItemActivity.this,
@@ -165,12 +178,28 @@ public class AddSavingsItemActivity extends AppCompatActivity {
             double amount = Double.valueOf(amountStr);
             double yield = Double.valueOf(yieldStr);
             double interest = amount * (yield / 100) * (days / Constants.DAYS_OF_ONE_YEAR);
-            mEditInterest.setText(String.format(Locale.US, "%.2f", interest));
+            mEditInterest.setText(Utils.formatDouble(interest));
             Log.d(Constants.LOG_TAG, "start = " + mStartDate.toString() + "\nend = " + mEndDate.toString()
                     + "\ndays = " + days + "\namount = " + amount + "\nyield = " + yield + "\ninterest = " + interest);
         }
 
     }
 
+    /**
+     * Click listener for Cancel button
+     *
+     * @param view the cancel button
+     */
+    public void onCancelClicked(View view) {
+        onBackPressed();
+    }
 
+    /**
+     * Click listener for Save button
+     *
+     * @param view the save button
+     */
+    public void onSaveClicked(View view) {
+        //TODO save the item
+    }
 }

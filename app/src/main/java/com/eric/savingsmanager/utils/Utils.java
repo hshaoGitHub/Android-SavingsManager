@@ -56,4 +56,12 @@ public class Utils {
         return str == null || str.trim().length() == 0;
     }
 
+    /**
+     * Format a double to xxx.xx
+     * @param value a double to format
+     * @return a formatted string
+     */
+    public static String formatDouble(double value) {
+        return String.format(Locale.US, "%.2f", value);
+    }
 }
