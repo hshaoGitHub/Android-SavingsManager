@@ -12,11 +12,13 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.eric.savingsmanager.R;
+import com.eric.savingsmanager.data.SavingsBean;
 import com.eric.savingsmanager.data.SavingsContentProvider;
 import com.eric.savingsmanager.data.SavingsItemEntry;
 import com.eric.savingsmanager.utils.Constants;
@@ -42,11 +44,15 @@ public class AddSavingsItemActivity extends AppCompatActivity {
     private float mAmount;
     private float mYield;
     private float mInterest;
+    private SavingsBean mSavingsBean;
+    private boolean mEditMode = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_savings_item);
+
         setupUI();
     }
 
@@ -105,6 +111,34 @@ public class AddSavingsItemActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mSavingsBean = getIntent().getParcelableExtra(Constants.INTENT_EXTRA_SAVINGS_ITEM_PARCEL);
+        if (mSavingsBean != null) {
+            // set data to UI
+            mEditBankName.setText(mSavingsBean.getBankName());
+            mEditStartDate.setText(Utils.formatDate(new Date(mSavingsBean.getStartDate()),
+                    Constants.FORMAT_DATE_YEAR_MONTH_DAY));
+            mEditEndDate.setText(Utils.formatDate(new Date(mSavingsBean.getEndDate()),
+                    Constants.FORMAT_DATE_YEAR_MONTH_DAY));
+            mEditAmount.setText(Utils.formatFloat(mSavingsBean.getAmount()));
+            mEditYield.setText(Utils.formatFloat(mSavingsBean.getYield()));
+            mEditInterest.setText(Utils.formatFloat(mSavingsBean.getInterest()));
+
+            // update the buttons
+            ((Button) findViewById(R.id.btn_save)).setText(R.string.update);
+            ((Button) findViewById(R.id.btn_cancel)).setText(R.string.delete);
+
+            mEditMode = true;
+            // update the data in this screen
+            mStartDate = new Date(mSavingsBean.getStartDate());
+            mEndDate = new Date(mSavingsBean.getEndDate());
+            mAmount = mSavingsBean.getAmount();
+            mYield = mSavingsBean.getYield();
+            mInterest = mSavingsBean.getInterest();
+            Log.d(Constants.LOG_TAG, "Edit mode, displayed existing savings item:");
+            Log.d(Constants.LOG_TAG, mSavingsBean.toString());
+
+        }
 
     }
 
@@ -212,7 +246,20 @@ public class AddSavingsItemActivity extends AppCompatActivity {
      * @param view the cancel button
      */
     public void onCancelClicked(View view) {
-        onBackPressed();
+        if (mEditMode) {
+            // remove the item from database
+            getContentResolver().delete(SavingsContentProvider.CONTENT_URI,
+                    SavingsItemEntry._ID + "=" + mSavingsBean.getId(), null);
+            Log.d(Constants.LOG_TAG, "Edit mode, deleted existing savings item:");
+            Log.d(Constants.LOG_TAG, mSavingsBean.toString());
+            // Go back to dashboard
+            Intent intent = new Intent(this, DashBoardActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            finish();
+        }
+
     }
 
     /**
@@ -232,11 +279,18 @@ public class AddSavingsItemActivity extends AppCompatActivity {
             values.put(SavingsItemEntry.COLUMN_NAME_END_DATE, mEndDate.getTime());
             values.put(SavingsItemEntry.COLUMN_NAME_INTEREST, mInterest);
 
-            // Save the data into database by ContentProvider
-            getContentResolver().insert(
-                    SavingsContentProvider.CONTENT_URI,
-                    values
-            );
+            if (mEditMode) {
+                // Update the data into database by ContentProvider
+                getContentResolver().update(SavingsContentProvider.CONTENT_URI, values,
+                        SavingsItemEntry._ID + "=" + mSavingsBean.getId(), null);
+                Log.d(Constants.LOG_TAG, "Edit mode, updated existing savings item: " + mSavingsBean.getId());
+            } else {
+                // Add the data into database by ContentProvider
+                getContentResolver().insert(
+                        SavingsContentProvider.CONTENT_URI,
+                        values
+                );
+            }
 
             // Go back to dashboard
             Intent intent = new Intent(this, DashBoardActivity.class);

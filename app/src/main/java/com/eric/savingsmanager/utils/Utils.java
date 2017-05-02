@@ -2,6 +2,7 @@ package com.eric.savingsmanager.utils;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -97,5 +98,15 @@ public class Utils {
     public static float roundFloat(float f) {
         BigDecimal b = new BigDecimal(f);
         return b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+    }
+
+    /**
+     * Format money to RMB
+     * @param money to format
+     * @return formatted string
+     */
+    public static String formatMoney(float money) {
+        NumberFormat nf= NumberFormat.getCurrencyInstance(Locale.CHINA);
+        return nf.format(money);
     }
 }
