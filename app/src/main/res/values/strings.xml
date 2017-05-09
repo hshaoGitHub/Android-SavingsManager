@@ -20,4 +20,8 @@
 
     <string name="formatted_yield">%1$.2f%%</string>
 
+    <!-- Notifications -->
+    <string name="notification_due_savings_title">You got due savings item on %1$s!</string>
+    <string name="notification_due_savings_message">Cheers, tap to see how much richer you are!</string>
+
 </resources>

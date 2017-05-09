@@ -11,4 +11,8 @@ public class Constants {
 
     // Intent Extras
     public static final String INTENT_EXTRA_SAVINGS_ITEM_PARCEL = "extra_savings_item_parcel";
+    public static final String INTENT_EXTRA_ALARM_TIME = "extra_alarm_time";
+
+    // Intent Actions
+    public static final String ACTION_DUE_SAVINGS_ITEM_ALARM = "com.eric.savingsmanager.action.DUE_SAVINGS_ITEM_ALARM";
 }

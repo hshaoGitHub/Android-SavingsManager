@@ -3,7 +3,6 @@ package com.eric.savingsmanager.activities;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -116,10 +115,8 @@ public class AddSavingsItemActivity extends AppCompatActivity {
         if (mSavingsBean != null) {
             // set data to UI
             mEditBankName.setText(mSavingsBean.getBankName());
-            mEditStartDate.setText(Utils.formatDate(new Date(mSavingsBean.getStartDate()),
-                    Constants.FORMAT_DATE_YEAR_MONTH_DAY));
-            mEditEndDate.setText(Utils.formatDate(new Date(mSavingsBean.getEndDate()),
-                    Constants.FORMAT_DATE_YEAR_MONTH_DAY));
+            mEditStartDate.setText(Utils.formatDate(mSavingsBean.getStartDate()));
+            mEditEndDate.setText(Utils.formatDate(mSavingsBean.getEndDate()));
             mEditAmount.setText(Utils.formatFloat(mSavingsBean.getAmount()));
             mEditYield.setText(Utils.formatFloat(mSavingsBean.getYield()));
             mEditInterest.setText(Utils.formatFloat(mSavingsBean.getInterest()));
@@ -195,12 +192,12 @@ public class AddSavingsItemActivity extends AppCompatActivity {
                         // set the date to EditText
                         Calendar calendar = Calendar.getInstance();
                         calendar.set(year, month, dayOfMonth);
-                        Date date = new Date(calendar.getTimeInMillis());
-                        edit.setText(Utils.formatDate(date, Constants.FORMAT_DATE_YEAR_MONTH_DAY));
+                        long timestamp = calendar.getTimeInMillis();
+                        edit.setText(Utils.formatDate(timestamp));
                         if (startDate) {
-                            mStartDate = new Date(date.getTime());
+                            mStartDate = new Date(timestamp);
                         } else {
-                            mEndDate = new Date(date.getTime());
+                            mEndDate = new Date(timestamp);
                         }
                         // has to do here
                         updateInterest();
@@ -253,8 +250,7 @@ public class AddSavingsItemActivity extends AppCompatActivity {
             Log.d(Constants.LOG_TAG, "Edit mode, deleted existing savings item:");
             Log.d(Constants.LOG_TAG, mSavingsBean.toString());
             // Go back to dashboard
-            Intent intent = new Intent(this, DashBoardActivity.class);
-            startActivity(intent);
+            Utils.gotoDashBoard(this);
             finish();
         } else {
             finish();
@@ -293,8 +289,8 @@ public class AddSavingsItemActivity extends AppCompatActivity {
             }
 
             // Go back to dashboard
-            Intent intent = new Intent(this, DashBoardActivity.class);
-            startActivity(intent);
+            Utils.gotoDashBoard(this);
+            finish();
         } else {
             Toast.makeText(this, R.string.missing_savings_information, Toast.LENGTH_LONG).show();
         }

@@ -2,6 +2,7 @@ package com.eric.savingsmanager.activities;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -23,6 +24,8 @@ import com.eric.savingsmanager.R;
 import com.eric.savingsmanager.data.SavingsBean;
 import com.eric.savingsmanager.data.SavingsContentProvider;
 import com.eric.savingsmanager.data.SavingsItemEntry;
+import com.eric.savingsmanager.manager.AlarmsManager;
+import com.eric.savingsmanager.manager.DataManager;
 import com.eric.savingsmanager.utils.Constants;
 import com.eric.savingsmanager.utils.Utils;
 
@@ -36,6 +39,7 @@ public class DashBoardActivity extends AppCompatActivity
     private SavingsItemListAdapter mListAdapter;
     ArrayList<SavingsBean> mSavingsBeanList = new ArrayList<>();
     private ProgressBar mProgressBar;
+    private Date mNextDueSavingsDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +178,14 @@ public class DashBoardActivity extends AppCompatActivity
 
         mListAdapter.notifyDataSetChanged();
 
+        if (!Utils.isNullOrEmpty(mSavingsBeanList)) {
+            mNextDueSavingsDate = DataManager.getNextDueSavingsItemDate(mSavingsBeanList);
+            if (mNextDueSavingsDate != null) {
+                // schedule an alarm
+                AlarmsManager.scheduleAlarm(this, mNextDueSavingsDate);
+            }
+
+        }
     }
 
 
@@ -214,12 +226,24 @@ public class DashBoardActivity extends AppCompatActivity
             SavingsBean savingsBean = mSavingsBeanList.get(position);
             viewHolder.bankName.setText(savingsBean.getBankName());
             viewHolder.amount.setText(Utils.formatMoney(savingsBean.getAmount()));
-            viewHolder.startTime.setText(Utils.formatDate(new Date(savingsBean.getStartDate()),
-                    Constants.FORMAT_DATE_YEAR_MONTH_DAY));
-            viewHolder.endTime.setText(Utils.formatDate(new Date(savingsBean.getEndDate()),
-                    Constants.FORMAT_DATE_YEAR_MONTH_DAY));
+            viewHolder.startTime.setText(Utils.formatDate(savingsBean.getStartDate()));
+            viewHolder.endTime.setText(Utils.formatDate(savingsBean.getEndDate()));
             viewHolder.yield.setText(getString(R.string.formatted_yield, savingsBean.getYield()));
             viewHolder.interest.setText(Utils.formatMoney(savingsBean.getInterest()));
+
+            // Date color
+            if (Utils.isToday(savingsBean.getEndDate())) {
+                // Is today
+                viewHolder.endTime.setTextColor(Color.BLUE);
+            } else if (savingsBean.getEndDate() < new Date().getTime()) {
+                // Before today
+                viewHolder.endTime.setTextColor(Color.LTGRAY);
+            } else if (mNextDueSavingsDate != null
+                    && savingsBean.getEndDate() == mNextDueSavingsDate.getTime()) {
+                // Next due date
+                viewHolder.endTime.setTextColor(Color.RED);
+            }
+
             return convertView;
         }
 

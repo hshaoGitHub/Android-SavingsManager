@@ -30,7 +30,16 @@
             android:name=".data.SavingsContentProvider"
             android:authorities="com.eric.savingsmanager.provider"
             android:enabled="true"
-            android:exported="false"></provider>
+            android:exported="false" />
+
+        <receiver
+            android:name=".receivers.SavingsManagerReceivers"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.eric.savingsmanager.action.DUE_SAVINGS_ITEM_ALARM"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
